@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inframind-app
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://postgres:postgres_pass@db:5432/inframind_db
+      - REDIS_URL=redis://cache:6379/0
+      - AWS_REGION=us-east-1
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    networks:
+      - inframind-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: inframind-postgres
+    environment:
+      - POSTGRES_DB=inframind_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inframind-network
+
+  cache:
+    image: redis:7-alpine
+    container_name: inframind-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - inframind-network
+
+networks:
+  inframind-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inframind-config
+  namespace: inframind
+data:
+  ENVIRONMENT: "production"
+  AWS_REGION: "us-east-1"
+  LOG_LEVEL: "INFO"
+  PORT: "8000"

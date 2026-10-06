@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inframind-app
+  namespace: inframind
+  labels:
+    app: inframind-app
+    tier: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: inframind-app
+  template:
+    metadata:
+      labels:
+        app: inframind-app
+    spec:
+      containers:
+      - name: inframind-container
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/inframind-ai:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: inframind-config
+        - secretRef:
+            name: inframind-secrets
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
