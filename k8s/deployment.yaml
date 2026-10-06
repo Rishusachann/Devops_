@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: inframind-container
-        image: <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/inframind-ai:latest
+        image: 128793514319.dkr.ecr.us-east-1.amazonaws.com/inframind-ai:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
